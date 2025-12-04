@@ -1,0 +1,33 @@
+[project]
+name = "comfyui-image-processor"
+version = "1.0.0"
+description = "Comprehensive image processing plugin for ComfyUI"
+authors = [{name = "AI Assistant"}]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "torch",
+    "numpy",
+    "Pillow",
+    "comfyui"
+]
+
+[project.urls]
+Repository = "https://github.com/your-username/comfyui-image-processor"
+Documentation = "https://github.com/your-username/comfyui-image-processor#readme"
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+
+[tool.black]
+line-length = 120
+target-version = ['py38']
+
+[tool.isort]
+profile = "black"
+line_length = 120
