@@ -27,7 +27,7 @@
 1. 导航到您的 ComfyUI `custom_nodes` 目录
 2. 克隆或复制此仓库：
    ```bash
-   git clone https://github.com/your-repo/ComfyUI-image-processor-zn123.git
+   git clone https://github.com/zn123/ComfyUI-image-processor-zn123
    ```
 3. 重启 ComfyUI
 4. 节点将出现在 `image/processor` 分类中

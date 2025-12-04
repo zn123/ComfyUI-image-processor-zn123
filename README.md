@@ -27,7 +27,7 @@ A comprehensive image processing plugin for ComfyUI that provides various image 
 1. Navigate to your ComfyUI `custom_nodes` directory
 2. Clone or copy this repository:
    ```bash
-   git clone https://github.com/your-repo/ComfyUI-image-processor-zn123.git
+   git clone https://github.com/zn123/ComfyUI-image-processor-zn123
    ```
 3. Restart ComfyUI
 4. The nodes will appear in the `image/processor` category
