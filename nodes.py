@@ -151,6 +151,87 @@ class ZNImageScaleByLongSideNode:
 
         return (s, new_width, new_height)
 
+
+class ZNImageScaleByShortSideFactorNode:
+    """
+    根据输入图片的短边尺寸自动调整缩放比例的节点。
+    用户可以设置多个短边尺寸范围，每个范围对应不同的缩放比例。
+    例如：
+      - 短边小于512像素的图片放大4倍
+      - 短边在512-1024之间的图片放大2倍
+      - 短边大于1024的图片不缩放
+    """
+
+
+    @classmethod
+    def INPUT_TYPES(cls):
+        return {
+            "required": {
+                "image": ("IMAGE",),
+                "upscale_method": (["nearest", "bilinear", "bicubic", "area", "lanczos"], {"default": "bicubic"}),
+                # 短边尺寸阈值，小于此尺寸将使用scale_factor1
+                "threshold1": ("INT", {"default": 512, "min": 64, "max": 2048, "step": 1}),
+                # 短边尺寸阈值，小于此尺寸将使用scale_factor2，大于等于threshold1且小于threshold2
+                "threshold2": ("INT", {"default": 1024, "min": 64, "max": 4096, "step": 1}),
+                # 不同范围的缩放因子
+                "scale_factor1": ("FLOAT", {"default": 4.0, "min": 0.1, "max": 10.0, "step": 0.1}),
+                "scale_factor2": ("FLOAT", {"default": 2.0, "min": 0.1, "max": 10.0, "step": 0.1}),
+                "scale_factor3": ("FLOAT", {"default": 1.0, "min": 0.1, "max": 10.0, "step": 0.1}),
+                # 是否仅放大而不缩小
+                "only_upscale": ("BOOLEAN", {"default": True}),
+            }
+        }
+
+    RETURN_TYPES = ("IMAGE", "INT", "INT", "FLOAT", "STRING")
+    RETURN_NAMES = ("scaled_image", "width", "height", "scale_factor", "scale_info")
+    FUNCTION = "scale_by_short_side_factor"
+    CATEGORY = "image/processor"
+    # 添加这一行使节点显示输出值
+    OUTPUT_NODE = True
+
+    def scale_by_short_side_factor(self, image, upscale_method, threshold1, threshold2,
+                                   scale_factor1, scale_factor2, scale_factor3, only_upscale):
+        # Get image dimensions
+        batch_size, img_height, img_width, channels = image.shape
+
+        # Determine current short side
+        current_short_side = min(img_width, img_height)
+
+        # Determine scale factor based on short side
+        if current_short_side < threshold1:
+            scale_factor = scale_factor1
+            range_info = f"short side < {threshold1}px"
+        elif current_short_side < threshold2:
+            scale_factor = scale_factor2
+            range_info = f"{threshold1}px ≤ short side < {threshold2}px"
+        else:
+            scale_factor = scale_factor3
+            range_info = f"short side ≥ {threshold2}px"
+
+        # If only_upscale is True and scale_factor < 1.0, set to 1.0 (no downscaling)
+        if only_upscale and scale_factor < 1.0:
+            scale_factor = 1.0
+            range_info += " (only upscale mode)"
+
+        # If scale_factor is 1.0, return original image
+        if scale_factor == 1.0:
+            info = f"Original: {img_width}×{img_height}, Short side: {current_short_side}px, Scale: 1.0x, {range_info}"
+            # return (image, img_width, img_height, scale_factor, info)
+            return {"ui": {"text": (info,)}, "result": (image, img_width, img_height, scale_factor, info)}
+        # Calculate new dimensions
+        new_width = round(img_width * scale_factor)
+        new_height = round(img_height * scale_factor)
+
+        # Perform the scaling
+        samples = image.movedim(-1, 1)
+        s = comfy.utils.common_upscale(samples, new_width, new_height, upscale_method, "disabled")
+        s = s.movedim(1, -1)
+
+        # Create info string
+        info = f"Original: {img_width}×{img_height}, Short side: {current_short_side}px, Scale: {scale_factor:.1f}x, New: {new_width}×{new_height}, {range_info}"
+        # return (s, new_width, new_height, scale_factor, info)
+        return {"ui": {"text": (info,)}, "result": (s, new_width, new_height, scale_factor, info)}
+
 class ZNImageRotateNode:
     """Image rotation node"""
     

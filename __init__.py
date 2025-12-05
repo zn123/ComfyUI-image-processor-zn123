@@ -27,6 +27,7 @@ def register_nodes():
         # ZNImageCropNode,
         ZNImageAdjustBrightnessNode,
         ZNImageAdjustContrastNode,
+        ZNImageScaleByShortSideFactorNode,
         # ZNImageBlurNode,
         # ZNImageSharpenNode,
         ZNImageGrayscaleNode,
@@ -37,6 +38,7 @@ def register_nodes():
     # Register node mappings
     NODE_CLASS_MAPPINGS.update({
         "ImageUpscale": ZNImageScaleNode,
+        "ImageScaleByShortSideFactor": ZNImageScaleByShortSideFactorNode,
         "ImageResize": ZNImageResizeNode,
         # "ImageRotate": ZNImageRotateNode,
         # "ImageFlip": ZNImageFlipNode,
@@ -51,7 +53,8 @@ def register_nodes():
     })
     
     NODE_DISPLAY_NAME_MAPPINGS.update({
-        "ImageUpscale": "Image Upscale @zn123",
+        "ImageUpscale": "Image Scale @zn123",
+        "ImageScaleByShortSideFactor": "Image Scale By Short Side Factor @zn123",
         "ImageResize": "Image Resize @zn123",
         # "ImageRotate": "Image Rotate @zn123",
         # "ImageFlip": "Image Flip @zn123",
